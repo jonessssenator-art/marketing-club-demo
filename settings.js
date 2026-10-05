@@ -1,16 +1,18 @@
 function defaultClubSettings(){return {dues:{amount:4000,months:6},banner:{label:'MARKETING CLUB / ДАГЕСТАН',title:'Здесь знают,\nс кем делать дело.',description:'Находите своих людей, обменивайтесь опытом\nи создавайте проекты вместе.',buttonText:'Познакомиться с участниками',url:'#members',date:'',place:''}}}
+function profileContactPlaceholders(){
+  const contacts=[
+    ['WhatsApp','Написать в WhatsApp','<path d="M21 11.5a9 9 0 0 1-13.3 7.9L3 21l1.6-4.7A9 9 0 1 1 21 11.5z"/><path d="M8 7c0 5 4 9 9 9l1-3-3-1-1 2c-2-1-3-2-4-4l2-1-1-3z"/>'],
+    ['Telegram','@username','<path d="m21 3-4 18-6-5-4 3 1-6L21 3 2 10l6 3m3 3 6-8"/>'],
+    ['Телефон','+7 (___) ___-__-__','<path d="m7 3 3 5-2 2c1.5 3 3 4.5 6 6l2-2 5 3-1 4C10 22 2 14 3 4z"/>'],
+    ['Instagram','@username','<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/>']
+  ];
+  return `<section class="profile-contacts"><h3>Контакты</h3><div class="contact-grid">${contacts.map(([name,value,path])=>`<button type="button" class="contact-placeholder" data-contact-demo aria-label="${name}: демонстрационный контакт"><span class="contact-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg></span><span><strong>${name}</strong><small>${value}</small></span><span class="contact-arrow" aria-hidden="true">↗</span></button>`).join('')}</div><p class="small-note">Пример контактных данных. Номер и аккаунты пока не указаны.</p></section>`;
+}
 function monthLabel(n){const a=n%10,b=n%100;return b>=11&&b<=14?'месяцев':a===1?'месяц':a>=2&&a<=4?'месяца':'месяцев'}
 function duesLabel(){const d=db.settings.dues;return `${money(d.amount)} за ${d.months} ${monthLabel(d.months)}`}
 function settings(){
   if(mode!=='admin')return;
-  const d=db.settings.dues;
-  $('#app').innerHTML=head('АДМИНИСТРАТОР','Настройки клуба','Условия участия и информация на главной странице.')+`<section class="panel settings-panel"><div class="section-title"><h2>Членские взносы</h2><span class="badge active">${duesLabel()}</span></div><form id="dues-settings-form"><div class="form-grid"><label>Размер взноса, ₽<input name="amount" type="number" min="1" max="10000000" step="1" required value="${d.amount}"></label><label>Срок участия, месяцев<input name="months" type="number" min="1" max="60" step="1" required value="${d.months}"></label></div><p class="small-note">Новые условия появятся в обзоре, правилах вступления и форме записи взноса. Ранее записанные суммы и оплаченные периоды сохранятся.</p><button class="primary" type="submit">Сохранить условия взноса</button></form></section><section class="panel settings-panel"><h2>Главная плашка</h2><p>Анонс встречи, мероприятие или важная информация для участников.</p><div class="rule-actions">${button('Редактировать плашку','banner-edit')}</div></section>`;
-  $('#dues-settings-form').onsubmit=e=>{
-    e.preventDefault();if(mode!=='admin')return;
-    const f=new FormData(e.target),amount=Number(f.get('amount')),months=Number(f.get('months'));
-    if(!Number.isInteger(amount)||amount<1||amount>10000000||!Number.isInteger(months)||months<1||months>60)return toast('Укажите корректную сумму и срок от 1 до 60 месяцев');
-    if(commitSettings(`Изменены условия взноса: ${money(amount)}, ${months} ${monthLabel(months)}`,()=>{db.settings.dues={amount,months}})){settings();toast('Новые условия взноса сохранены')}
-  };bind();
+  $('#app').innerHTML=head('АДМИНИСТРАТОР','Настройки','Параметры клуба и пространства.')+`<section class="settings-coming-soon"><div class="settings-coming-icon">${icon('admin')}</div><span class="coming-badge">В разработке</span><h2>Данный раздел ещё в разработке</h2><p>Здесь появятся настройки клуба.</p><a class="primary" href="#overview">Вернуться к обзору</a></section>`;
 }
 function commitSettings(action,mutate){const previous=JSON.parse(JSON.stringify(db));mutate();if(save(action))return true;db=previous;return false}
 function bannerURL(value){
